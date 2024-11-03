@@ -1,0 +1,159 @@
+
+&time_control 
+ run_days                            = 0, 
+ run_hours                           = 0, 
+ run_minutes                         = 0, 
+ run_seconds                         = 0, 
+ start_year                          = YYYY, YYYY, 
+ start_month                         = 02,   02, 
+ start_day                           = 10,   10, 
+ start_hour                          = 12,   12,   12, 
+ start_minute                        = 00,   00,   00, 
+ start_second                        = 00,   00,   00, 
+ end_year                            = YYYY, YYYY, 
+ end_month                           = 07,   07, 
+ end_day                             = 31,   31, 
+ end_hour                            = 18,   18,   18, 
+ end_minute                          = 00,   00,   00, 
+ end_second                          = 00,   00,   00, 
+ interval_seconds                    = 21600 
+ input_from_file                     = .true.,.true.,.true.,
+ io_form_input                       = 2
+ io_form_boundary                    = 2
+
+ history_interval                    = 0,    0,   60,
+ frames_per_outfile                  = 10,  10, 1000,
+ restart                             = .false.,
+ restart_interval                    = 14400,
+ io_form_restart                     = 2
+ 
+ auxinput4_inname                    = "wrflowinp_d<domain>"
+ auxinput4_interval                  = 360, 360, 360,
+ io_form_history                     = 2
+ io_form_auxinput4                   = 2
+ 
+ output_diagnostics                  = 1
+ auxhist3_outname                    = "wrfdaily_d<domain>_<date>"
+ auxhist3_interval                   = 1440, 1440,
+ frames_per_auxhist3                 = 200,  200,
+ io_form_auxhist3                    = 2
+ debug_level                         = 0
+
+ iofields_filename                   = "tkb_hydro_d01.txt", "tkb_hydro_d02.txt", "tkb_hydro_d03.txt",
+ ignore_iofields_warning             = .true.,
+ auxhist7_outname                    = "wrfhydro_hourly_d<domain>_<date>",
+ auxhist7_interval                   = 60, 60, 180,
+ frames_per_auxhist7                 = 24, 24, 8,
+ io_form_auxhist7                    = 2,
+
+!Below is only active when &diag is active
+ auxhist23_outname    ='wrfpress_d<domain>_<date>'
+ auxhist23_interval   = 1440,  1440,
+ frames_per_auxhist23 = 30,     30,
+ io_form_auxhist23    = 2
+/ 
+
+ &diags
+ p_lev_diags = 1
+ num_press_levels = 10,
+ press_levels = 92500, 85000, 70000, 60000, 50000, 40000,30000, 20000, 15000 10000,
+/
+
+ &domains 
+ time_step                           = 120, 
+ time_step_fract_num                 = 0, 
+ time_step_fract_den                 = 1, 
+ max_dom                             = 2, 
+ e_we                                = 555, 391,
+ e_sn                                = 296  457,
+ e_vert                              = 40,  40,    40, 
+ p_top_requested                     = 5000, 
+ num_metgrid_levels                  = 38, 
+ num_metgrid_soil_levels             = 4, 
+ dx                                  = 30000, 10000,  3333.33, 
+ dy                                  = 30000, 10000,  3333.33, 
+ grid_id                             = 1,     2,     3, 
+ parent_id                           = 0,     1,     2, 
+ i_parent_start                      = 1,     222,    30, 
+ j_parent_start                      = 1,     93,    30, 
+ parent_grid_ratio                   = 1,     3,     3, 
+ parent_time_step_ratio              = 1,     3,     3, 
+ feedback                            = 1, 
+ smooth_option                       = 0, 
+ / 
+ 
+ &physics 
+ mp_physics                          = 4, 4,     3, 
+ mp_zero_out                         = 0, 
+ mp_zero_out_thresh                  = 1.e-8 
+ mp_tend_lim                         = 10.
+ no_mp_heating                       = 0,
+ do_radar_ref                        = 1, 
+ shcu_physics                        = 0, 
+ topo_wind                           = 0, 
+ isfflx                              = 1, 
+ iz0tlnd                             = 1, 
+ isftcflx                            = 0, 
+ ra_lw_physics                       = 1,     1,     1, 
+ ra_sw_physics                       = 1,     1,     1, 
+ radt                                = 30,    30,    30, 
+ sf_sfclay_physics                   = 1,     1,     1, 
+ sf_surface_physics                  = 2,     2,     2, 
+ bl_pbl_physics                      = 1,     1,     1, 
+ bldt                                = 0,     0,     0, 
+ cu_physics                          = 1,     1,     0, 
+ cudt                                = 0,     0,     5, 
+ ifsnow                              = 1, 
+ icloud                              = 1, 
+ surface_input_source                = 3, 
+ num_soil_layers                     = 4, 
+ num_land_cat                        = 28, 
+ sf_urban_physics                    = 1, 
+ sst_update                          = 1, 
+ tmn_update                          = 1, 
+ sst_skin                            = 1, 
+ kfeta_trigger                       = 1, 
+ mfshconv                            = 0, 
+ prec_acc_dt                         = 0, 
+ sf_lake_physics                     = 1,
+ use_lakedepth                       = 1, 
+ / 
+ 
+ &fdda
+ grid_fdda 			     =2, 
+ / 
+ 
+ &dynamics 
+ w_damping                           = 1,     
+ diff_opt                            = 1,      1,      1, 
+ km_opt                              = 4,      4,      4, 
+ diff_6th_opt                        = 0,      0,      0, 
+ diff_6th_factor                     = 0.12,   0.12,   0.12, 
+ base_temp                           = 290. 
+ damp_opt                            = 0, 
+ zdamp                               = 5000.,  5000.,  5000., 
+ dampcoef                            = 0.2,    0.2,    0.2 
+ khdif                               = 0,      0,      0, 
+ kvdif                               = 0,      0,      0, 
+ non_hydrostatic                     = .true., .true., .true., 
+ moist_adv_opt                       = 1,      1,      1, 
+ scalar_adv_opt                      = 1,      1,      1, 
+ / 
+ 
+ &bdy_control 
+ spec_bdy_width                      = 10, 
+ spec_zone                           = 1, 
+ relax_zone                          = 9, 
+ spec_exp                            = 0.33, 
+ specified                           = .true., .false.,.false., 
+ nested                              = .false., .true., .true., 
+ / 
+ 
+ &grib2 
+ / 
+ 
+ &namelist_quilt 
+ nio_tasks_per_group = 0, 
+ nio_groups = 1, 
+ / 
+

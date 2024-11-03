@@ -8,7 +8,7 @@
 #SBATCH --account=nn9853k 
 
 ## Job name:
-#SBATCH --job-name=reYYYYDD
+#SBATCH --job-name=re@YYYY@DD
 ## Allocating amount of resources:
 ##SBATCH --nodes=1
 ## Number of tasks (aka processes) to start on each node: Pure mpi, one task per core

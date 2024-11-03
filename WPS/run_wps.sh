@@ -8,7 +8,7 @@
 #SBATCH --account=nn9853k 
 
 ## Job name:
-#SBATCH --job-name=wpYYYYDD
+#SBATCH --job-name=wp@YYYY@DD
 
 ## Allocating amount of resources:
 ##SBATCH --nodes=1
@@ -41,12 +41,13 @@ set -o nounset # Treat unset variables as errors
  echo "Run geogrid"
  ./geogrid.exe >& my_geogrid.log
 
+
 ###############################################
 # link boundary pressure level data and run ungrib
 ###############################################
  echo "Ungrib PLEV"
  sed -i "s|prefix[= ]*'SFLX'|prefix = 'PLEV'|" namelist.wps
-./link_grib.csh $rundir/CFS/pgb*.grb2
+./link_grib.csh ../CFS/pgb*.grb2
  #ln -sf /cluster/home/titikekb/masterwrf/WPS/ungrib/Variable_Tables/Vtable.CFSR_press_pgbh06 Vtable
  # Downloaded from https://github.com/yyr/wps/blob/master/ungrib/Variable_Tables/
  ln -sf ./Variable_Tables/Vtable.CFSR_press_pgbh06 Vtable
@@ -59,7 +60,7 @@ set -o nounset # Treat unset variables as errors
 ###############################################
  echo "Ungrib SFLX"
  sed -i "s|prefix[= ]*'PLEV'|prefix = 'SFLX'|" namelist.wps
- ./link_grib.csh $rundir/CFS/flx*.grb2
+ ./link_grib.csh ../CFS/flx*.grb2
  #ln -sf /cluster/home/titikekb/masterwrf/WPS/ungrib/Variable_Tables/Vtable.CFSR_sfc_flxf06 Vtable
  # Downloaded from https://github.com/yyr/wps/blob/master/ungrib/Variable_Tables/
  ln -sf ./Variable_Tables/Vtable.CFSR_sfc_flxf06 Vtable

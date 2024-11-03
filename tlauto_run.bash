@@ -1,4 +1,5 @@
 #!/bin/bash
+# Script by Tyge Løvset, NORCE Reginal Climate, 2024
 
 if [ -z "$2" ]; then
   echo "Usage: $0 <year-imonth-iday> <run_months> [download [force]]"
@@ -7,6 +8,7 @@ if [ -z "$2" ]; then
   exit
 fi
 run_months=$2
+dry_run=0
 
 year=$(date "+%Y" -d "$1")
 imon=$(date "+%m" -d "$1")
@@ -35,25 +37,21 @@ startdir=$(cd $(dirname $0) ; pwd)
 start=${imon}${iday}00
 
 outdir="/nird/projects/NS9853K/users/tylo/CFSv2_downscaled_wrfout/MAM-WRFOUT"
-export outdir
-
-rundir="/cluster/work/users/tylo/MAM_CFSv2_downscaling/MAM_${year}${start}"
-export rundir
+rundir="/cluster/work/users/${USER}/MAM_CFSv2_downscaling/MAM_${year}${start}"
 
 echo --------------------------------------------------------------------------------------------------
 echo YEAR: $year.$start
 echo RUNDIR: $rundir
-echo HINDCAST: /cluster/projects/nn9853k/WRF_Hindcast_input/CFS2V_Reforecast_MAM/$year/${year}${start}
 
 # Predownload all years...
 if [ "$3" == "download" ]; then
 
   for (( ; year <= 2023; year++ )); do
     hindcast=/cluster/projects/nn9853k/WRF_Hindcast_input/CFS2V_Reforecast_MAM/$year/${year}${start}
+    echo "Hindcast: $hindcast"
 
     if [ -d $hindcast ] && [ "$4" != "force" ]; then
-      echo "Hindcast source files already downloaded:"
-      echo "    $hindcast"
+      echo "    hindcast source files already downloaded."
     else
       mkdir -p $hindcast
       pushd $hindcast
@@ -74,10 +72,10 @@ else
 
   # Only download given input year - if needed
   hindcast=/cluster/projects/nn9853k/WRF_Hindcast_input/CFS2V_Reforecast_MAM/$year/${year}${start}
+  echo "Hindcast: $hindcast"
 
   if [ -d $hindcast ]; then
-    echo "Hindcast source files already downloaded:"
-    echo "    $hindcast"
+    echo "    hindcast source files already downloaded."
   else
     mkdir -p $hindcast
     pushd $hindcast
@@ -92,7 +90,9 @@ fi
 # Enter rundir:
 
 if [ -d $rundir ]; then
-  echo "Rundir already exists..."
+  echo "Rundir already exists, canceling..."
+  echo "   $rundir"
+  exit
 fi
 echo Rundir: $rundir
 mkdir -p $rundir
@@ -110,7 +110,7 @@ rm -rf CFS
 mkdir CFS
 
 pushd CFS
-  ln -s /cluster/projects/nn9853k/WRF_Hindcast_input/CFS2V_Reforecast_MAM/$year/${year}${start}/*01.${year}${start}.grb2* .
+  ln -s $hindcast/*01.${year}${start}.grb2* .
 popd
 
 ###############################################
@@ -138,10 +138,10 @@ pushd WPS
   cp $startdir/WPS/run_metgrid.sh .
   cp -r $startdir/WPS/ungrib/Variable_Tables .
 
-  sed -i -e "s/YYYY2/$year2/g" -e "s/MM2/$imon2/g" -e "s/DD2/$iday2/g" \
-         -e "s/YYYY/$year/g" -e "s/MM/$imon/g" -e "s/DD/$iday/g" namelist.wps
-  sed -i -e "s/YYYY/$year/g" -e "s/DD/$iday/g" run_wps.sh
-  sed -i -e "s/YYYY/$year/g" -e "s/DD/$iday/g" run_metgrid.sh
+  sed -i -e "s|@YYYY2|$year2|g" -e "s|@MM2|$imon2|g" -e "s|@DD2|$iday2|g" \
+         -e "s|@YYYY|$year|g" -e "s|@MM|$imon|g" -e "s|@DD|$iday|g" namelist.wps
+  sed -i -e "s|@YYYY|$year|g" -e "s|@DD|$iday|g" run_wps.sh
+  sed -i -e "s|@YYYY|$year|g" -e "s|@DD|$iday|g" run_metgrid.sh
 
   echo "Link WPS files."
   ./linkWPS.csh
@@ -150,7 +150,9 @@ pushd WPS
   # Run WPS geogrid, ungrib and avg_tsfc
   ###############################################
   echo "Run all WPS: geogrid.exe, ungrib.exe and avg_tsfc.exe"
-  wps_job=$(../sbatch_wrapper.sh run_wps.sh)
+  if [ "$dry_run" != "1" ]; then
+    wps_job=$(../sbatch_wrapper.sh run_wps.sh)
+  fi
   echo "wps_job: $wps_job"
   
   ## sed -i "48s|SFLX|SST|" namelist.wps
@@ -165,7 +167,9 @@ pushd WPS
   # running metgrid
   ###############################################
   echo "Run metgrid.exe"
-  metg_job=$(../sbatch_wrapper.sh --dependency=afterok:$wps_job run_metgrid.sh)
+  if [ "$dry_run" != "1" ]; then
+    metg_job=$(../sbatch_wrapper.sh --dependency=afterok:$wps_job run_metgrid.sh)
+  fi
   echo "metg_job: $metg_job"
 
 popd # WPS
@@ -187,11 +191,12 @@ pushd WRFRUN
   cp $startdir/WRF/namelist.input .
   cp $startdir/WRF/copy_output.sh .
 
-  sed -i -e "s/YYYY2/$year2/g" -e "s/MM2/$imon2/g" -e "s/DD2/$iday2/g" \
-         -e "s/YYYY/$year/g" -e "s/MM/$imon/g" -e "s/DD/$iday/g" namelist.input
-  sed -i -e "s/YYYY/$year/g" -e "s/DD/$iday/g" run_real.sh
-  sed -i -e "s/YYYY/$year/g" -e "s/DD/$iday/g" run_wrf.sh
-  sed -i -e "s/YYYY/$year/g" -e "s/DD/$iday/g" copy_output.sh
+  sed -i -e "s|@YYYY2|$year2|g" -e "s|@MM2|$imon2|g" -e "s|@DD2|$iday2|g" \
+         -e "s|@YYYY|$year|g" -e "s|@MM|$imon|g" -e "s|@DD|$iday|g" namelist.input
+  sed -i -e "s|@YYYY|$year|g" -e "s|@DD|$iday|g" run_real.sh
+  sed -i -e "s|@YYYY|$year|g" -e "s|@DD|$iday|g" run_wrf.sh
+  sed -i -e "s|@YYYY|$year|g" -e "s|@DD|$iday|g" \
+         -e "s|@RUNDIR|$rundir|g" -e "s|@OUTDIR|$outdir|g" copy_output.sh
 
   echo "Link WRF program files."
   ./linkWRF.csh
@@ -200,21 +205,49 @@ pushd WRFRUN
   # run real.exe
   ###############################################
   echo "Run real.exe"
-  real_job=$(../sbatch_wrapper.sh --dependency=afterok:$metg_job run_real.sh)
+  if [ "$dry_run" != "1" ]; then
+    real_job=$(../sbatch_wrapper.sh --dependency=afterok:$metg_job run_real.sh)
+  fi
   echo "real_job: $real_job"
   
   ###############################################
   # run wrf.exe
   ###############################################
   echo "Run wrf.exe"
-  wrf_job=$(../sbatch_wrapper.sh --dependency=afterok:$real_job run_wrf.sh)
+  if [ "$dry_run" != "1" ]; then
+    wrf_job=$(../sbatch_wrapper.sh --dependency=afterok:$real_job run_wrf.sh)
+  fi
   echo "wrf_job: $wrf_job"
 
   ###############################################
   # copy wrf.exe output
   ###############################################
   echo "Copy wrf.exe output to target"
-  sbatch --dependency=afterok:$wrf_job copy_output.sh
+  if [ "$dry_run" != "1" ]; then
+    sbatch --dependency=afterok:$wrf_job copy_output.sh
+  fi
 popd # WRFRUN
 
 echo "SUCCESS!"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

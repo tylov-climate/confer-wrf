@@ -8,7 +8,7 @@
 #SBATCH --account=nn9853k 
 
 ## Job name:
-#SBATCH --job-name=copyYYYY
+#SBATCH --job-name=cp@YYYY@DD
 ## Allocating amount of resources:
 #SBATCH --nodes=1 --ntasks-per-node=32
 
@@ -28,12 +28,9 @@
 set -o errexit # Make bash exit on any error
 set -o nounset # Treat unset variables as errors
 
-if [ -z "$rundir" ]; then
-    echo "Failed copy_output";
-    exit 1;
-fi
+rundir="@RUNDIR"
+outdir="@OUTDIR"
 
-#outdir="/nird/projects/NS9853K/users/tylo/CFSv2_downscaled_wrfout/MAM-WRFOUT"
 target=$outdir/$(basename $rundir)
 
 mkdir -p $target

@@ -8,12 +8,12 @@
 #SBATCH --account=nn9853k 
 
 ## Job name:
-#SBATCH --job-name=wfYYYYDD
+#SBATCH --job-name=wf@YYYY@DD
 ## Allocating amount of resources:
 ## Number of tasks (aka processes) to start on each node: Pure mpi, one task per core
 ##SBATCH --nodes=1 --ntasks-per-node=1
 ##SBATCH --nodes=10 --ntasks-per-node=32 # Failed
-#SBATCH --nodes=7 --ntasks-per-node=32
+#SBATCH --nodes=15 --ntasks-per-node=32
 
 ## No memory pr task since this option is turned off on Fram in partition normal.
 ## Run for 10 minutes, syntax is d-hh:mm:ss

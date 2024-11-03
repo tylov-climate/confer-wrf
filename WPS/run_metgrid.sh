@@ -8,7 +8,7 @@
 #SBATCH --account=nn9853k 
 
 ## Job name:
-#SBATCH --job-name=mgYYYYDD
+#SBATCH --job-name=mg@YYYY@DD
 
 ## Allocating amount of resources:
 ##SBATCH --nodes=1

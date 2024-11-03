@@ -42,7 +42,7 @@ for (( month = imon; month <= imon+5; month ++ )); do
   for (( day = start; day <= 31; day ++ )); do
     ymd=$(printf "%04d%02d%02d" $year $month $day)
 
-    for run in "00" "06" "12" "18"; do
+    for run in 00 06 12 18; do
       #wget -nd -np -P . -r -R "index.html*" $page/$var$ymd$run.01.1996042600.grb2
       #echo wget -c "$page/${var}${ymd}${run}.01.${itime}.grb2"
       wget -c "$page/${var}${ymd}${run}.01.${itime}.grb2"
@@ -62,7 +62,7 @@ for (( month = imon; month <= imon+5; month ++ )); do
   for (( day = start; day <= 31; day ++ )); do
     ymd=$(printf "%04d%02d%02d" $year $month $day)
 
-    for run in "00" "06" "12" "18"; do
+    for run in 00 06 12 18; do
       #wget -nd -np -P . -r -R "index.html*" $page/$var$ymd$run.01.1996042600.grb2
       #echo wget -c "$page/${var}${ymd}${run}.01.${itime}.grb2"
       wget -c "$page/${var}${ymd}${run}.01.${itime}.grb2"

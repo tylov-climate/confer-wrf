@@ -53,18 +53,17 @@ ymd=$(date "+%Y%m%d" -d "$1")
 
 while [ "$ymd" != "$end" ]; do
     for run in 00 06 12 18; do
+      wget -c -nv "$page1/${var1}${ymd}${run}.01.${itime}.grb2" &
       if [ "$run" == "18" ]; then
-        wget -c -nv "$page1/${var1}${ymd}${run}.01.${itime}.grb2"
+        wget -c -nv "$page2/${var2}${ymd}${run}.01.${itime}.grb2"
       else
-        wget -c -nv "$page1/${var1}${ymd}${run}.01.${itime}.grb2" &
+        wget -c -nv "$page2/${var2}${ymd}${run}.01.${itime}.grb2" &
       fi
-      wget -c -nv "$page2/${var2}${ymd}${run}.01.${itime}.grb2" &
     done
 
     ymd=$(date "+%Y%m%d" -d "$ymd +1 day")
 done
 
-echo "Wait for finish"
 wait
 echo "All downloaded"
 exit 0

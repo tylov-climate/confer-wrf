@@ -1,19 +1,23 @@
 #!/bin/bash
 # Download MAM series from 1991-2023
+# Script by Tyge Løvset, NORCE, 2024
 
-if [ -z "$3" ]; then
-  echo "Usage $0 YEAR IMON IDAY"
+if [ -z "$2" ]; then
+  echo "Usage $0 YEAR-IMON-IDAY RUN_MONTHS"
   echo "  YEAR: 1991 .. 2023"
   echo "  IMON: init month"
   echo "  IDAY: init day of month"
+  echo "  RUN_MONTHS: simulation time"
   echo ""
   exit
 fi
 
 # Note: February starts at date 10th.
-year=$1
-imon=$2
-iday=$3
+year=$(date "+%Y" -d "$1")
+imon=$(date "+%m" -d "$1")
+iday=$(date "+%d" -d "$1")
+run_months=$2
+
 itime=${year}${imon}${iday}00
 
 if (( year < 2012 )); then
@@ -28,46 +32,39 @@ else
   subdir="${year}${imon}/${year}${imon}${iday}/${itime}"
 fi
 
-echo Input: $flx_root/$year/$subdir
+echo "----------------------------------"
+echo Flxf input: $flx_root/$year/$subdir
+echo Pgbf input: $pl_root/$year/$subdir
+echo "----------------------------------"
 
-#page=https://www.ncei.noaa.gov/data/climate-forecast-system/access/reforecast/6-hourly-by-pressure-level-9-month-runs/1992/199205/19920511
-#page=https://www.ncei.noaa.gov/data/climate-forecast-system/access/operational-9-month-forecast/6-hourly-by-pressure/2022/202205/20220501/2022050100
+# page=https://www.ncei.noaa.gov/data/climate-forecast-system/access/reforecast/6-hourly-by-pressure-level-9-month-runs/1992/199205/19920511
+# page=https://www.ncei.noaa.gov/data/climate-forecast-system/access/operational-9-month-forecast/6-hourly-by-pressure/2022/202205/20220501/2022050100
+# page=https://www.ncei.noaa.gov/data/climate-forecast-system/access/reforecast/6-hourly-flux-9-month-runs/1991/199102/19910210/flxf1991021000.01.1991021000.grb2
 
-var="flxf"
-page="$flx_root/$year/$subdir"
-#page=https://www.ncei.noaa.gov/data/climate-forecast-system/access/reforecast/6-hourly-flux-9-month-runs/1991/199102/19910210/flxf1991021000.01.1991021000.grb2 
+page1="$flx_root/$year/$subdir"
+var1="flxf"
 
-start=$iday
-for (( month = imon; month <= imon+5; month ++ )); do
-  for (( day = start; day <= 31; day ++ )); do
-    ymd=$(printf "%04d%02d%02d" $year $month $day)
+page2="$pl_root/$year/$subdir"
+var2="pgbf"
 
+
+end=$(date "+%Y%m%d" -d "$year-$imon-01 +$run_months months")
+ymd=$(date "+%Y%m%d" -d "$1")
+
+while [ "$ymd" != "$end" ]; do
     for run in 00 06 12 18; do
-      #wget -nd -np -P . -r -R "index.html*" $page/$var$ymd$run.01.1996042600.grb2
-      #echo wget -c "$page/${var}${ymd}${run}.01.${itime}.grb2"
-      wget -c "$page/${var}${ymd}${run}.01.${itime}.grb2"
-      #printf "\n"
+      if [ "$run" == "18" ]; then
+        wget -c -nv "$page1/${var1}${ymd}${run}.01.${itime}.grb2"
+      else
+        wget -c -nv "$page1/${var1}${ymd}${run}.01.${itime}.grb2" &
+      fi
+      wget -c -nv "$page2/${var2}${ymd}${run}.01.${itime}.grb2" &
     done
-  done
-  start=1
+
+    ymd=$(date "+%Y%m%d" -d "$ymd +1 day")
 done
 
-
-var="pgbf"
-page="$pl_root/$year/$subdir"
-#page=https://www.ncei.noaa.gov/data/climate-forecast-system/access/reforecast/6-hourly-by-pressure-level-9-month-runs/1991/199102/19910210/pgbf1991021000.01.1991021000.grb2 
-
-start=$iday
-for (( month = imon; month <= imon+5; month ++ )); do
-  for (( day = start; day <= 31; day ++ )); do
-    ymd=$(printf "%04d%02d%02d" $year $month $day)
-
-    for run in 00 06 12 18; do
-      #wget -nd -np -P . -r -R "index.html*" $page/$var$ymd$run.01.1996042600.grb2
-      #echo wget -c "$page/${var}${ymd}${run}.01.${itime}.grb2"
-      wget -c "$page/${var}${ymd}${run}.01.${itime}.grb2"
-      #printf "\n"
-    done
-  done
-  start=1
-done
+echo "Wait for finish"
+wait
+echo "All downloaded"
+exit 0

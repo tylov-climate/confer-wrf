@@ -56,13 +56,8 @@ if [ "$3" == "download" ]; then
       mkdir -p $hindcast
       pushd $hindcast
         cp $startdir/cfs2v_reforecast_download.sh .
-        if (( (year % 6) == 1 )); then 
-          echo "./cfs2v_reforecast_download.sh $year $imon $iday"
-          ./cfs2v_reforecast_download.sh $year $imon $iday
-        else
-          echo "nohup ./cfs2v_reforecast_download.sh $year $imon $iday &"
-          nohup ./cfs2v_reforecast_download.sh $year $imon $iday &
-        fi
+        echo "./cfs2v_reforecast_download.sh $year $imon $iday"
+        ./cfs2v_reforecast_download.sh $year $imon $iday >& my_download.log
       popd
     fi
   done # all years
@@ -81,7 +76,7 @@ else
     pushd $hindcast
       cp $startdir/cfs2v_reforecast_download.sh .
       echo "./cfs2v_reforecast_download.sh $year $imon $iday"
-      ./cfs2v_reforecast_download.sh $year $imon $iday
+      ./cfs2v_reforecast_download.sh $year $imon $iday >& my_download.log
     popd
   fi
 
@@ -229,25 +224,3 @@ pushd WRFRUN
 popd # WRFRUN
 
 echo "SUCCESS!"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

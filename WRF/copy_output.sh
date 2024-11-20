@@ -25,15 +25,28 @@
 ## Setting variables and prepare runtime environment:
 ##----------------------------------------------------
 ## Recommended safety settings:
-set -o errexit # Make bash exit on any error
+#set -o errexit # Make bash exit on any error
 set -o nounset # Treat unset variables as errors
 
 rundir="@RUNDIR"
 outdir="@OUTDIR"
 
+mkdir -p LOGS
+cp -af namelist.input LOGS/namelist.input.wrf
+cp -af rsl.error.0000 LOGS/rsl.error.0000.wrf
+cp -af *.sh LOGS
+cp -af *.log LOGS
+cp -af slurm* LOGS
+ls -al > LOGS/ls_wrf.log
+
 target=$outdir/$(basename $rundir)
 
-mkdir -p $target
-cp -p wrfdaily_d* $target
-cp -p wrfpress_d* $target
-cp -p wrfhydro_hourly_d* $target
+#mkdir -p $target
+scp -rpq LOGS $USER@login.nird.sigma2.no:$target > my_copy.log
+scp -pq TAVGSFC $USER@login.nird.sigma2.no:$target >> my_copy.log
+scp -pq wrfdaily_d* $USER@login.nird.sigma2.no:$target >> my_copy.log
+scp -pq wrfpress_d* $USER@login.nird.sigma2.no:$target >> my_copy.log
+scp -pq wrfhydro_hourly_d* $USER@login.nird.sigma2.no:$target >> my_copy.log
+scp -pq my_copy.log $USER@login.nird.sigma2.no:$target/LOGS
+
+exit 0

@@ -53,6 +53,15 @@ module load WRF/4.4-foss-2022a-dmpar
 # Run the application, and we typically time it:
 ##------------------------------------------------------
 
+echo "Backup WPS logs"
+mkdir -p LOGS
+cp -af ../WPS/*.log LOGS
+cp -af ../WPS/*.sh LOGS
+cp -af ../WPS/slurm* LOGS
+cp -af ../WPS/namelist.wps LOGS
+cp -af ../WPS/metgrid.log.0000 LOGS
+ls -al ../WPS > LOGS/ls_wps.log
+
 # Make sure geo_em and met_em data are linked.
 echo "Link WPS geo_em.d??.nc and met_em.d* files."
 ln -sf ../WPS/geo_em.d??.nc .

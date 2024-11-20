@@ -3,8 +3,8 @@
 
 if [ -z "$2" ]; then
   echo "Usage: $0 <year-imonth-iday> <run_months> [download [force]]"
-  echo ""
   echo " e.g.: $0 1991-02-10 6"
+  echo ""
   exit
 fi
 run_months=$2
@@ -37,7 +37,8 @@ startdir=$(cd $(dirname $0) ; pwd)
 start=${imon}${iday}00
 
 outdir="/nird/projects/NS9853K/users/tylo/CFSv2_downscaled_wrfout/MAM-WRFOUT"
-rundir="/cluster/work/users/${USER}/MAM_CFSv2_downscaling/MAM_${year}${start}"
+#rundir="/cluster/work/users/${USER}/MAM_CFSv2_downscaling/MAM_${year}${start}"
+rundir="/cluster/projects/nn9853k/${USER}/MAM_CFSv2_downscaling/MAM_${year}${start}"
 
 echo --------------------------------------------------------------------------------------------------
 echo YEAR: $year.$start
@@ -219,7 +220,7 @@ pushd WRFRUN
   ###############################################
   echo "Copy wrf.exe output to target"
   if [ "$dry_run" != "1" ]; then
-    sbatch --dependency=afterok:$wrf_job copy_output.sh
+    sbatch --dependency=afterok:$wrf_job ./copy_output.sh
   fi
 popd # WRFRUN
 

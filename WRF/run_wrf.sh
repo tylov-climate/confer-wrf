@@ -45,8 +45,11 @@ module load WRF/4.4-foss-2022a-dmpar
 # output is copied back and taken care of
 ##-----------------------------------------------------
 
-echo "Backup real.exe rsl.error.0000"
-cp -p rsl.error.0000 rsl.error.0000.real
+echo "Backup real.exe logs"
+mkdir -p LOGS
+cp -af namelist.input LOGS/namelist.input.real
+cp -af rsl.error.0000 LOGS/rsl.error.0000.real
+ls -al > LOGS/ls_real.log
 
 ########################################################
 # Run the application, and we typically time it:

@@ -1,6 +1,7 @@
 #!/bin/bash
 if [ "$1" != "-f" ]; then
     echo Usage $0 -f
+    exit 1
 fi
 
 rm -f ../WPS/met_em.d*

@@ -10,11 +10,11 @@
 ## Job name:
 #SBATCH --job-name=cp@YYYY@DD
 ## Allocating amount of resources:
-#SBATCH --nodes=1 --ntasks-per-node=32
+#SBATCH --nodes=1 -ntasks-per-node=4
 
 ## No memory pr task since this option is turned off on Fram in partition normal.
 ## Run for 10 minutes, syntax is d-hh:mm:ss
-#SBATCH --time=0-01:00:00 
+#SBATCH --time=0-02:00:00
 
 ## Set email notifictions
 #SBATCH --mail-user=tylo@norceresearch.no
@@ -33,7 +33,7 @@ outdir="@OUTDIR"
 
 mkdir -p LOGS
 cp -af namelist.input LOGS/namelist.input.wrf.$(date "+%Y%m%d-%H%M")
-cp -af rsl.error.0000 LOGS/rsl.error.0000.wrf.$(date "+%Y%m%d-%H%M")
+gzip -c2 rsl.error.0000 > LOGS/rsl.error.0000.wrf.$(date "+%Y%m%d-%H%M").gz
 cp -af my_wrf.log LOGS/my_wrf.log.$(date "+%Y%m%d-%H%M")
 cp -af *.sh LOGS
 cp -af *.log LOGS

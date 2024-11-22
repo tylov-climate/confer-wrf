@@ -59,7 +59,7 @@ cp -af ../WPS/*.log LOGS
 cp -af ../WPS/*.sh LOGS
 cp -af ../WPS/slurm* LOGS
 cp -af ../WPS/namelist.wps LOGS
-cp -af ../WPS/metgrid.log.0000 LOGS
+gzip -c2 ../WPS/metgrid.log.0000 > LOGS/metgrid.log.0000.gz
 ls -al ../WPS > LOGS/ls_wps.log
 
 # Make sure geo_em and met_em data are linked.

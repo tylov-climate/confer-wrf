@@ -32,8 +32,9 @@ rundir="@RUNDIR"
 outdir="@OUTDIR"
 
 mkdir -p LOGS
-cp -af namelist.input LOGS/namelist.input.wrf
-cp -af rsl.error.0000 LOGS/rsl.error.0000.wrf
+cp -af namelist.input LOGS/namelist.input.wrf.$(date "+%Y%m%d-%H%M")
+cp -af rsl.error.0000 LOGS/rsl.error.0000.wrf.$(date "+%Y%m%d-%H%M")
+cp -af my_wrf.log LOGS/my_wrf.log.$(date "+%Y%m%d-%H%M")
 cp -af *.sh LOGS
 cp -af *.log LOGS
 cp -af slurm* LOGS
@@ -41,12 +42,12 @@ ls -al > LOGS/ls_wrf.log
 
 target=$outdir/$(basename $rundir)
 
-#mkdir -p $target
-scp -rpq LOGS $USER@login.nird.sigma2.no:$target > my_copy.log
-scp -pq TAVGSFC $USER@login.nird.sigma2.no:$target >> my_copy.log
-scp -pq wrfdaily_d* $USER@login.nird.sigma2.no:$target >> my_copy.log
-scp -pq wrfpress_d* $USER@login.nird.sigma2.no:$target >> my_copy.log
-scp -pq wrfhydro_hourly_d* $USER@login.nird.sigma2.no:$target >> my_copy.log
-scp -pq my_copy.log $USER@login.nird.sigma2.no:$target/LOGS
+ssh $USER@login.nird.sigma2.no "mkdir -p $target/LOGS" > my_copy.log
+scp -pq ./LOGS/* $USER@login.nird.sigma2.no:$target/LOGS >> my_copy.log
+scp -pq ../WPS/TAVGSFC $USER@login.nird.sigma2.no:$target >> my_copy.log
+scp -pq ./wrfdaily_d* $USER@login.nird.sigma2.no:$target >> my_copy.log
+scp -pq ./wrfpress_d* $USER@login.nird.sigma2.no:$target >> my_copy.log
+scp -pq ./wrfhydro_hourly_d* $USER@login.nird.sigma2.no:$target >> my_copy.log
+scp -pq ./my_copy.log $USER@login.nird.sigma2.no:$target/LOGS
 
 exit 0

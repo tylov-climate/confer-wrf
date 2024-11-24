@@ -28,8 +28,6 @@
 #set -o errexit # Make bash exit on any error
 set -o nounset # Treat unset variables as errors
 
-rundir="@RUNDIR"
-outdir="@OUTDIR"
 
 mkdir -p LOGS
 cp -af namelist.input LOGS/namelist.input.wrf.$(date "+%Y%m%d-%H%M")
@@ -40,7 +38,7 @@ cp -af *.log LOGS
 cp -af slurm* LOGS
 ls -al > LOGS/ls_wrf.log
 
-target=$outdir/$(basename $rundir)
+target="@TARGET"
 
 ssh $USER@login.nird.sigma2.no "mkdir -p $target/LOGS" > my_copy.log
 scp -pq ./LOGS/* $USER@login.nird.sigma2.no:$target/LOGS >> my_copy.log

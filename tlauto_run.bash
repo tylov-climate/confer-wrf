@@ -186,13 +186,16 @@ pushd WRFRUN
   cp $startdir/WRF/tkb_hydro_d0?.txt .
   cp $startdir/WRF/namelist.input .
   cp $startdir/WRF/copy_output.sh .
+  cp $startdir/WRF/clean_data.sh .
+
+  target=$outdir/$(basename $rundir)
 
   sed -i -e "s|@YYYY2|$year2|g" -e "s|@MM2|$imon2|g" -e "s|@DD2|$iday2|g" \
          -e "s|@YYYY|$year|g" -e "s|@MM|$imon|g" -e "s|@DD|$iday|g" namelist.input
   sed -i -e "s|@YYYY|$year|g" -e "s|@DD|$iday|g" run_real.sh
   sed -i -e "s|@YYYY|$year|g" -e "s|@DD|$iday|g" run_wrf.sh
   sed -i -e "s|@YYYY|$year|g" -e "s|@DD|$iday|g" \
-         -e "s|@RUNDIR|$rundir|g" -e "s|@OUTDIR|$outdir|g" copy_output.sh
+         -e "s|@TARGET|$target|g" copy_output.sh
 
   echo "Link WRF program files."
   ./linkWRF.csh

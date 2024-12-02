@@ -53,7 +53,7 @@ module load WRF/4.4-foss-2022a-dmpar
 # Run the application, and we typically time it:
 ##------------------------------------------------------
 
-echo "Backup WPS logs"
+# Backup WPS logs
 mkdir -p LOGS
 cp -af ../WPS/*.log LOGS
 cp -af ../WPS/*.sh LOGS
@@ -75,6 +75,13 @@ mpirun ./real.exe >& my_real.log
 
 ## For IntelMPI (intel toolchain), mpirun is recommended:
 #time mpirun MySoftWare-exec
+
+# Backup real.exe logs
+mkdir -p LOGS
+cp -af namelist.input LOGS/namelist.input.real.$(date -r namelist.input "+%Y%m%d-%H%M")
+cp -af rsl.error.0000 LOGS/rsl.error.0000.real.$(date -r rsl.error.0000 "+%Y%m%d-%H%M")
+ls -al > LOGS/ls_real.log.$(date "+%Y%m%d-%H%M")
+
 
 #########################################################
 # That was about all this time; lets call it a day...

@@ -45,11 +45,11 @@ module load WRF/4.4-foss-2022a-dmpar
 # output is copied back and taken care of
 ##-----------------------------------------------------
 
-echo "Backup real.exe logs"
+# Backup real.exe logs
 mkdir -p LOGS
-cp -af namelist.input LOGS/namelist.input.real
-if [ -f rsl.error.0000 ]; then cp -af rsl.error.0000 LOGS/rsl.error.0000.real; fi
-ls -al > LOGS/ls_real.log
+#cp -af namelist.input LOGS/namelist.input.real.$(date -r namelist.input "+%Y%m%d-%H%M")
+#cp -af rsl.error.0000 LOGS/rsl.error.0000.real.$(date -r rsl.error.0000 "+%Y%m%d-%H%M")
+#ls -al > LOGS/ls_real.log.$(date "+%Y%m%d-%H%M")
 
 ########################################################
 # Run the application, and we typically time it:

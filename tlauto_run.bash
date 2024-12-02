@@ -221,10 +221,20 @@ pushd WRFRUN
   ###############################################
   # copy wrf.exe output
   ###############################################
-  echo "Copy wrf.exe output to target"
+  echo "Wait for copy of output until WRF is successfully done"
+  while [ 1 == 1 ]; do
+    if  [ -f "wrfhydro_hourly_d01_${year}-${imon2}-${iday2}_00:00:00" ] &&
+          -f "wrfhydro_hourly_d02_${year}-${imon2}-${iday2}_00:00:00" ]; then
+      break
+    fi
+    sleep 30
+  done
+
+  echo "copying..."
   if [ "$dry_run" != "1" ]; then
-    sbatch --dependency=afterok:$wrf_job ./copy_output.sh
+    bash ./copy_output.sh
   fi
 popd # WRFRUN
 
 echo "SUCCESS!"
+exit 0

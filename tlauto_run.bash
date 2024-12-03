@@ -24,8 +24,8 @@ echo $year2, $imon2, $iday2
 ## Setting variables and prepare runtime environment:
 ##----------------------------------------------------
 ## Recommended safety settings:
-#set -o errexit # Make bash exit on any error
-#set -o nounset # Treat unset variables as errors
+set -o errexit # Make bash exit on any error
+set -o nounset # Treat unset variables as errors
 
 ########################################################################
 # set directory to copy important scripts and files and creat working
@@ -36,7 +36,8 @@ startdir=$(cd $(dirname $0) ; pwd)
 #start=021000 # month, date, hour
 start=${imon}${iday}00
 
-outdir="/nird/projects/NS9853K/users/tylo/CFSv2_downscaled_wrfout/MAM-WRFOUT"
+#outdir="/nird/projects/NS9853K/users/tylo/CFSv2_downscaled_wrfout/MAM-WRFOUT"
+outdir="/datalake/NS9853K/CFSv2_downscaled_wrfout/MAM-WRFOUT"
 #rundir="/cluster/work/users/${USER}/MAM_CFSv2_downscaling/MAM_${year}${start}"
 rundir="/cluster/projects/nn9853k/${USER}/MAM_CFSv2_downscaling/MAM_${year}${start}"
 
@@ -45,7 +46,7 @@ echo YEAR: $year.$start
 echo RUNDIR: $rundir
 
 # Predownload all years...
-if [ "$3" == "download" ]; then
+if [ 0 == 1 ]; then
 
   for (( ; year <= 2023; year++ )); do
     hindcast=/cluster/projects/nn9853k/WRF_Hindcast_input/CFS2V_Reforecast_MAM/$year/${year}${start}
@@ -224,7 +225,7 @@ pushd WRFRUN
   echo "Wait for copy of output until WRF is successfully done"
   while [ 1 == 1 ]; do
     if  [ -f "wrfhydro_hourly_d01_${year}-${imon2}-${iday2}_00:00:00" ] &&
-          -f "wrfhydro_hourly_d02_${year}-${imon2}-${iday2}_00:00:00" ]; then
+        [ -f "wrfhydro_hourly_d02_${year}-${imon2}-${iday2}_00:00:00" ]; then
       break
     fi
     sleep 30

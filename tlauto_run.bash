@@ -224,12 +224,13 @@ pushd WRFRUN
   ###############################################
   echo "Wait for copy of output until WRF is successfully done"
   while [ 1 == 1 ]; do
+    sleep 30
     if  [ -f "wrfhydro_hourly_d01_${year}-${imon2}-${iday2}_00:00:00" ] &&
         [ -f "wrfhydro_hourly_d02_${year}-${imon2}-${iday2}_00:00:00" ]; then
       break
     fi
-    sleep 30
   done
+  sleep 720
 
   echo "copying..."
   if [ "$dry_run" != "1" ]; then

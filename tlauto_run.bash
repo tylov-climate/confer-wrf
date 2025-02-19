@@ -2,7 +2,7 @@
 # Script by Tyge Løvset, NORCE Reginal Climate, 2024
 
 if [ -z "$2" ]; then
-  echo "Usage: $0 <year-imonth-iday> <run_months> [download [force]]"
+  echo "Usage: $0 <year-imonth-iday> <run_months> [download]"
   echo " e.g.: $0 1991-02-10 6"
   echo ""
   exit
@@ -25,7 +25,7 @@ echo $year2, $imon2, $iday2
 ##----------------------------------------------------
 ## Recommended safety settings:
 set -o errexit # Make bash exit on any error
-set -o nounset # Treat unset variables as errors
+#set -o nounset # Treat unset variables as errors
 
 ########################################################################
 # set directory to copy important scripts and files and creat working
@@ -38,31 +38,28 @@ start=${imon}${iday}00
 
 #outdir="/nird/projects/NS9853K/users/tylo/CFSv2_downscaled_wrfout/MAM-WRFOUT"
 outdir="/datalake/NS9853K/CFSv2_downscaled_wrfout/MAM-WRFOUT"
-#rundir="/cluster/work/users/${USER}/MAM_CFSv2_downscaling/MAM_${year}${start}"
-rundir="/cluster/projects/nn9853k/${USER}/MAM_CFSv2_downscaling/MAM_${year}${start}"
+rundir="/cluster/work/users/${USER}/MAM_CFSv2_downscaling/MAM_${year}${start}"
+#rundir="/cluster/projects/nn9853k/${USER}/MAM_CFSv2_downscaling/MAM_${year}${start}"
 
 echo --------------------------------------------------------------------------------------------------
 echo YEAR: $year.$start
 echo RUNDIR: $rundir
 
 # Predownload all years...
-if [ 0 == 1 ]; then
+if [ "$3" == "download" ]; then
 
   for (( ; year <= 2023; year++ )); do
     hindcast=/cluster/projects/nn9853k/WRF_Hindcast_input/CFS2V_Reforecast_MAM/$year/${year}${start}
     echo "Hindcast: $hindcast"
 
-    if [ -d $hindcast ] && [ "$4" != "force" ]; then
-      echo "    hindcast source files already downloaded."
-    else
-      mkdir -p $hindcast
-      pushd $hindcast
-        cp $startdir/cfs2v_reforecast_download.sh .
-        echo "./cfs2v_reforecast_download.sh $year $imon $iday"
-        ./cfs2v_reforecast_download.sh $year $imon $iday >& my_download.log
-      popd
-    fi
+    mkdir -p $hindcast
+    pushd $hindcast
+      cp $startdir/cfs2v_reforecast_download.bash .
+      echo "bash cfs2v_reforecast_download.bash $year-$imon-$iday $run_months" | tee download.bash
+      bash download.bash >& my_download.log
+    popd
   done # all years
+
   exit # stop after download all
 
 else
@@ -71,16 +68,12 @@ else
   hindcast=/cluster/projects/nn9853k/WRF_Hindcast_input/CFS2V_Reforecast_MAM/$year/${year}${start}
   echo "Hindcast: $hindcast"
 
-  if [ -d $hindcast ]; then
-    echo "    hindcast source files already downloaded."
-  else
-    mkdir -p $hindcast
-    pushd $hindcast
-      cp $startdir/cfs2v_reforecast_download.sh .
-      echo "./cfs2v_reforecast_download.sh $year $imon $iday"
-      ./cfs2v_reforecast_download.sh $year $imon $iday >& my_download.log
-    popd
-  fi
+  mkdir -p $hindcast
+  pushd $hindcast
+    cp $startdir/cfs2v_reforecast_download.bash .
+    echo "bash cfs2v_reforecast_download.bash $year-$imon-$iday $run_months" | tee download.bash
+    bash download.bash >& my_download.log
+  popd
 
 fi
 
@@ -95,8 +88,8 @@ echo Rundir: $rundir
 mkdir -p $rundir
 cd $rundir
 
-cp $startdir/tlauto_run.bash $rundir
-cp $startdir/sbatch_wrapper.sh $rundir
+cp $startdir/tlauto_run.bash .
+cp $startdir/sbatch_wrapper.sh .
 
 
 rm -rf ANALYSIS
@@ -189,7 +182,7 @@ pushd WRFRUN
   cp $startdir/WRF/copy_output.sh .
   cp $startdir/WRF/clean_data.sh .
 
-  target=$outdir/$(basename $rundir)
+  target=$outdir/$(basename $rundir) # on NIRD via ssh
 
   sed -i -e "s|@YYYY2|$year2|g" -e "s|@MM2|$imon2|g" -e "s|@DD2|$iday2|g" \
          -e "s|@YYYY|$year|g" -e "s|@MM|$imon|g" -e "s|@DD|$iday|g" namelist.input
@@ -222,20 +215,20 @@ pushd WRFRUN
   ###############################################
   # copy wrf.exe output
   ###############################################
-  echo "Wait for copy of output until WRF is successfully done"
-  while [ 1 == 1 ]; do
-    sleep 30
-    if  [ -f "wrfhydro_hourly_d01_${year}-${imon2}-${iday2}_00:00:00" ] &&
-        [ -f "wrfhydro_hourly_d02_${year}-${imon2}-${iday2}_00:00:00" ]; then
-      break
-    fi
-  done
-  sleep 720
+  #echo "Wait for copy of output until WRF is successfully done"
+  #while [ 1 == 1 ]; do
+  #  sleep 30
+  #  if  [ -f "wrfhydro_hourly_d01_${year}-${imon2}-${iday2}_00:00:00" ] &&
+  #      [ -f "wrfhydro_hourly_d02_${year}-${imon2}-${iday2}_00:00:00" ]; then
+  #    break
+  #  fi
+  #done
+  #sleep 720
 
-  echo "copying..."
-  if [ "$dry_run" != "1" ]; then
-    bash ./copy_output.sh
-  fi
+  #echo "copying..."
+  #if [ "$dry_run" != "1" ]; then
+  #  bash ./copy_output.sh
+  #fi
 popd # WRFRUN
 
 echo "SUCCESS!"
